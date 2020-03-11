@@ -1,0 +1,110 @@
+#include <SFML/Graphics.hpp>
+#include <math.h>
+#include <iostream>
+
+#define PI 3.1415
+
+int main()
+{
+	sf::RenderWindow window(sf::VideoMode(500, 500), "SFML works!");
+	sf::Texture test;
+	sf::Texture wall;
+	sf::Texture floor;
+	wall.loadFromFile("wall.jpg");
+	floor.loadFromFile("floor.jpg");
+	window.setFramerateLimit(60);
+	sf::View view2(sf::Vector2f(40.f, 40.f), sf::Vector2f(60.f, 60.f));
+	if (!test.loadFromFile("test.jpg"))
+	{
+		// error...
+	}
+	if (sf::Joystick::isConnected(0)) {
+	
+		std::cout << "Joy connected" << std::endl;
+	
+	}
+	test.setSmooth(true);
+	sf::Sprite main;
+	main.setTexture(test);
+	main.setPosition((float)(window.getSize().x/2),(float)(window.getSize().y/2));
+	main.setOrigin(25.0f, 25.0f);
+
+	float uAxisM = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::U);
+	float yAxisM = -sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		float rot = -main.getRotation();
+		float y_mov = (float)-std::sin(rot * PI / 180);
+		float x_mov = (float)std::cos(rot * PI / 180);
+		
+		if (main.getPosition().x+(test.getSize().x/2) + x_mov > window.getSize().x-25) {
+
+			x_mov = 0;
+
+		}if (main.getPosition().x-(test.getSize().x/2) + x_mov < 25) {
+
+			x_mov = 0;
+
+		}if (main.getPosition().y+(test.getSize().y/2) + y_mov > window.getSize().y-25) {
+
+			y_mov = 0;
+
+		}if (main.getPosition().y-(test.getSize().y/2) + y_mov < 25) {
+
+			y_mov = 0;
+
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)|| sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::U)<uAxisM)
+		{
+			// left key is pressed: move our character
+			main.rotate(-1.f);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::U) > uAxisM)
+		{
+			// left key is pressed: move our character
+			main.rotate(1.f);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)||sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) < yAxisM)
+		{
+			// left key is pressed: move our character
+			main.move(x_mov, y_mov);
+
+		}
+
+		window.clear(sf::Color::White);
+		for (int i = 0; i < window.getSize().x/25; i++) {
+
+			for (int j = 0; j < window.getSize().y/25; j++) {
+
+				if (i == 0 || j == 0 || i == window.getSize().x / 25 -1 || j == window.getSize().y / 25 - 1) {
+					sf::Sprite a;
+					a.setTexture(wall);
+					a.setPosition(i * 25, j * 25);
+					window.draw(a);
+				} else {
+				
+					sf::Sprite a;
+					a.setTexture(floor);
+					a.setPosition(i * 25, j * 25);
+					window.draw(a);
+				
+				}
+
+			}
+
+		}
+		window.draw(main);
+		window.display();
+	}
+
+	return 0;
+}
